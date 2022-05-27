@@ -15,3 +15,8 @@ In a world where C/C++ are great ways to develop an OS, why choose Rust? Aside f
 * First step in creating our OS kernel is to create a Rust executable that doesn't link the standard library. Portions of standard library require OS abstractions or specific hardware that is not in scope for the OS. We must be able to execute the freestanding code without an underlying operating system.
 * Disabling the standard library is easy through `#![no_std]`. Along with this comes disabling of basic constructs such as the `panic_handler` function, `eh_personality`, and even entrypoint. Work must be done to get a basic `main` running.
 * Linker will look for a function called `_start` as the entrypoint by default. It can find it, so long as the name is not mangled.
+* For a minimal kernel, we'll look to implement support for BIOS booting. UEFI is newer, but BIOS will be support.
+* BIOS can be loaded from flash memory on the motherboard. This is followed by control transfer to the bootloader, which is a 512-byte portion of executable code at the beginning of the disk. This will typically be at the beginning of the disk, hence how it is consistently found.
+* Subsequent stages larger than 512 bytes are stored elsewhere, and specified by the initial 512 byte portion. Additionally, the bootloader will switch the CPU from 16-bit real mode, into 32-bit protected mode, and then 64-bit long mode to get all 64-bit registers and memory ranges available. Lastly, it will query information (e.g. memory map) from BIOS to pass to OS kernel.
+* Additional memory-related manipulations are handled by `compiler-builtins-mem`.
+* Printing to screen starting with VGA text buffer.
